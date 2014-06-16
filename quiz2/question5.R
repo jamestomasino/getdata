@@ -1,20 +1,14 @@
 #!/usr/bin/env Rscript
 
-## Question 2
-## 
-## The sqldf package allows for execution of SQL commands on R data frames. 
-## We will use the sqldf package to practice the queries we might send with 
-## the dbSendQuery command in RMySQL. Download the American Community Survey 
-## data and load it into an R object called
+## Read this data set into R and report the sum of the numbers in the fourth 
+## column.
 
-##     acs
+##   https://d396qusza40orc.cloudfront.net/getdata%2Fwksst8110.for 
 
 depend <- function (s) {
 	if (s %in% rownames(installed.packages()) == FALSE) {install.packages(s)}
 	library(s, character.only=TRUE)
 }
-
-depend("sqldf")
 
 ## Create data folder for working data
 if (!file.exists("data")) {
@@ -22,8 +16,8 @@ if (!file.exists("data")) {
 }
 
 ## Use the following paths for data
-localURL <- "./data/acs.csv"
-remoteURL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06pid.csv"
+localURL <- "./data/wksst8110.for"
+remoteURL <- "https://d396qusza40orc.cloudfront.net/getdata%2Fwksst8110.for"
 
 if (!file.exists(localURL)) {
 	## Get working data and add it to working data folder
@@ -38,8 +32,9 @@ if (!file.exists(localURL)) {
 }
 
 ## Read working data
-acs <- read.csv(localURL)
-
-weights <- sqldf("select pwgtp1 from acs where AGEP < 50")
-
-print (weights)
+raw <- read.fwf(
+			localURL,
+			widths=c(12, 7,4, 9,4, 9,4, 9,4),
+			skip=4, 
+			header=FALSE)
+print (sum(raw$V4) )

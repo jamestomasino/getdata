@@ -1,13 +1,7 @@
 #!/usr/bin/env Rscript
 
-## Question 2
-## 
-## The sqldf package allows for execution of SQL commands on R data frames. 
-## We will use the sqldf package to practice the queries we might send with 
-## the dbSendQuery command in RMySQL. Download the American Community Survey 
-## data and load it into an R object called
-
-##     acs
+## Using the same data frame you created in the previous problem, what is the 
+## equivalent function to unique(acs$AGEP)
 
 depend <- function (s) {
 	if (s %in% rownames(installed.packages()) == FALSE) {install.packages(s)}
@@ -40,6 +34,6 @@ if (!file.exists(localURL)) {
 ## Read working data
 acs <- read.csv(localURL)
 
-weights <- sqldf("select pwgtp1 from acs where AGEP < 50")
+u <- unique(acs$AGEP)
 
-print (weights)
+u2 <- sqldf("select distinct AGEP from acs")
