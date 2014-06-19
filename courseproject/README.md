@@ -86,3 +86,13 @@ explained what the analysis files did.
 ### Data Analysis Explanation
 
 
+- Read features list (to be used as column names)
+- Read x_test
+- Assign column names
+
+
+
+
+
+
+
