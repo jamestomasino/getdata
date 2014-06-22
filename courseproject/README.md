@@ -50,6 +50,11 @@ errors saving your submission).
 
 _From Evaluation:_ Has the student submitted a tidy data set? 
 
+#### Second Data Set
+
+_From Question:_ Creates a second, independent tidy data set with the average
+of each variable for each activity and each subject.
+
 #### Github Repo with Required Scripts
 
 _From Question:_ Please submit a link to a Github repo with the code for

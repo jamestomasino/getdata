@@ -1,67 +1,74 @@
 #!/usr/bin/env Rscript
 
-## Function to check for and load dependency libraries automatically
-depend <- function (s) {
-	if (s %in% rownames(installed.packages()) == FALSE) {install.packages(s)}
-	library(s, character.only=TRUE)
-}
+## Read data sets and combine
+testData <- read.table("test/X_test.txt")
+trainData <- read.table("train/X_train.txt")
+X <- rbind(testData, trainData)
 
-## List of library dependencies
-#depend("sqldf")
+## Garbage collection
+rm(testData)
+rm(trainData)
 
-## Function to return activity name by number
-actName <- function (num) {
-	activities$V2[ activities[,"V1"] == num ]
-}
+## Read subjects and combine
+testSub <- read.table("test/subject_test.txt")
+trainSub <- read.table("train/subject_train.txt")
+S <- rbind(testSub, trainSub)
+
+## Garbage collection
+rm(testSub)
+rm(trainSub)
+
+## Read in data labels and combine
+testLabel <- read.table("test/y_test.txt")
+trainLabel <- read.table("train/y_train.txt")
+Y <- rbind(testLabel, trainLabel)
+
+## Garbage collection
+rm(testLabel)
+rm(trainLabel)
 
 ## Read Features List (to be used as column names for data)
 featuresList <- read.table("features.txt", stringsAsFactors=FALSE)
 
-## Append a new column name (for data merged in from label)
-featuresList <- rbind(featuresList, c( nrow(featuresList)+1, "activity" ) )
-
 ## Use only names from features list
 features <- featuresList$V2
 
+## Logical Vector to keep only std and mean columns
+keepColumns <- grepl("(std|mean[^F])", features, perl=TRUE)
+
+## Keep only data we want, and name it human readable
+X <- X[, keepColumns]
+names(X) <- features[keepColumns]
+names(X) <- gsub("\\(|\\)", "", names(X))
+names(X) <- tolower(names(X))
+
 ## Read ActivityList (to add descriptive names to data set)
 activities <- read.table("activity_labels.txt")
+activities[,2] = gsub("_", "", tolower(as.character(activities[,2])))
+Y[,1] = activities[Y[,1], 2]
+names(Y) <- "activity" ## Add activity label
 
-## Read data sets
-testData <- read.table("test/X_test.txt")
-trainData <- read.table("train/X_train.txt")
+## Add human readable labels to activity names
+names(S) <- "subject"
+tidyData <- cbind(S, Y, X)
+write.table(tidyData, "tidyData.txt")
 
-## Read in data labels
-testLabel <- read.table("test/y_test.txt")
-testFullLabel <- apply(testLabel, 1, actName)
-trainLabel <- read.table("train/y_train.txt")
-trainFullLabel <- apply(trainLabel, 1, actName)
+## Create second tiny data set with avg of each var for each act and each sub
+uS = unique(S)[,1]
+nS = length(uS)
+nA = length(activities[,1])
+nC = length(names(tidyData))
+td = tidyData[ 1:(nS*nA), ]
 
-## Combine activity data with main data set
-testData[,"activity"] <- testFullLabel
-trainData[,"activity"] <- trainFullLabel
+row = 1
+for (s in 1:nS) {
+	for (a in 1:nA) {
+		td[row,1] = uS[s]
+		td[row,2] = activities[a, 2]
+		tmp <- tidyData[tidyData$subject==s & tidyData$activity==activities[a,2],]
+		td[row, 3:nC] <- colMeans(tmp[, 3:nC])
+		row = row + 1
+	}
+}
 
-## Assign column names to data sets
-names(testData) <- features
-names(trainData) <- features
-
-## Combine the two datasets to one
-totalData <- rbind(testData, trainData)
-
-## Clean up source tables to save memory
-rm(testData)
-rm(trainData)
-
-# Extract only the measurements on the mean and standard deviation for each measurement
-keepColumns <- grepl ( "(std|mean[^F]|activity)", features, perl=TRUE )
-totalData <- totalData[,keepColumns,drop=FALSE]
-
-
-# Add labels to all variables
-
-
-# Add average of each variable for each activity and subject to data set
-
-
-# Export data set to clean file
-
-
+write.table(td, "tidyData2.txt")
