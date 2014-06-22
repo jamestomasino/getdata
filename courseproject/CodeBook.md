@@ -26,6 +26,17 @@ The script `run_analysis.R` performs the following process to clean up the data 
 
 6. The average of each measurement for each activity and each subject is merged to a second data set. The result is saved as `tidyData2.txt`.
 
+### Variables
+
+- testData - table contents of `test/X_test.txt`
+- trainData - table contents of `train/X_train.txt`
+- X - combined data set of the two above variables
+
+- testSub - table contents of `test/subject_test.txt`
+- trainSub - table contents of `test/subject_train.txt`
+- S - combined data set of the two above variables
+
+
 ### Output
 
 #### tidyData.txt
