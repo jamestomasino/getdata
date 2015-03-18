@@ -11,3 +11,4 @@ Merges the training and the test sets to create one data set
 2.set names to variables
 3.Merge columns to get the data frame Data for all data
 
+
